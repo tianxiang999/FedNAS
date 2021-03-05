@@ -1,62 +1,23 @@
-<font color='red'>FedNAS is now supported by FedML (https://www.fedml.ai). We suggest using use the FedML library for FedNAS research. </span>
+## Deployment
+PyTorch 1.4.0, MPI4Py 3.0.3 (https://pypi.org/project/mpi4py), Python 3.7.4, wandb, Anaconda 4.9.2
 
-## FedNAS: Federated Deep Learning via Neural Architecture Search
-This is the source code for the following paper:
-> [FedNAS: Federated Deep Learning via Neural Architecture Search](https://chaoyanghe.com/publications/FedNAS-CVPR2020-NAS.pdf)\
-> Chaoyang He, Murali Annavaram, Salman Avestimehr \
-> Accepted to <a href="https://sites.google.com/view/cvpr20-nas/" target="_blank">CVPR 2020 Workshop on Neural Architecture Search and Beyond for Representation Learning</a>
+### Setup
+1. Create environment space
 
-<img src="./docs/FedNAS.png" width="500">
+> conda create --name fednas --file spec-list.txt
 
-## 1. AutoFL System Design
+2. Other packages: Wandb & torchsummaryX
 
-<img src="./docs/system_design.png" width="500">
+> pip install --upgrade wandb; pip install torchsummaryX
 
-We design an AutoFL system based on FedNAS to evaluate our idea. 
-The system architecture is shown in the above figure. 
-This design separates the communication and the model training into two core components shared by the server and clients. 
-The first is the communication protocol component, which is responsible for low-level communication among the server and clients. 
-The second is the on-device deep learning component, which is built based on the popular deep learning framework PyTorch. 
-These two components are encapsulated as ComManager, Trainer, and Aggregator, providing high-level APIs for the above layers. 
-With the help of these APIs, in ClientManager, the client can train or search for better architectures and then send its results to the server-side, while in ServerManager,
- the server can aggregate and synchronize the model architecture and the model parameters with the client-side. 
+3. NFS (Network File System) Configuration in your cluster
 
-## 2. Environmental Setups
-Our code implementation is based on PyTorch 1.4.0, MPI4Py 3.0.3 (https://pypi.org/project/mpi4py), and Python 3.7.4.
+4. SSH log in without password
 
-Our experiment tracking platform is supported by Weights and Bias: https://www.wandb.com/
+5. Wandb init
+> wandb init $api-key
 
-
-
-### 2.1 Software Configuration
-Here is a step-by-step configuration to help you quickly set up a multi-GPU computing environment.
-### **- Conda**
-
-https://docs.conda.io/projects/conda/en/latest/user-guide/getting-started.html
-https://docs.conda.io/projects/conda/en/latest/user-guide/cheatsheet.html
-
-### **- PyTorch**
-
-> conda install pytorch torchvision cudatoolkit=10.1 -c pytorch
-
-### **- MPI4py**
-> conda install -c anaconda mpi4py
-
-### **- Weights and Bias**
-> pip install --upgrade wandb
-
-### **- torchsummaryX**
-> pip install torchsummaryX
-
-### **- NFS (Network File System) Configuration**
-Please google related installment instructions according to the OS version of your server.
-
-### **- change SSH configuration for your cluster**
-
-Login out and login again, you will find you don't need to input the passwords anymore.
-
-
-### **- config MPI host file**
+### Config MPI host file based on deployment settings (?)
 Modify the hostname list in "mpi_host_file" to correspond to your actual physical network topology.
 An example: Let us assume a network has a management node and four compute nodes (hostname: node1, node2, node3, node4).
 If you want use node1 and node2 to run our program, the "mpi_host_file" should be:
@@ -64,17 +25,7 @@ If you want use node1 and node2 to run our program, the "mpi_host_file" should b
 > node2 \
 > node3
 
-
-
-### 2.2 Hardware Requirements
-We set up our experiment in a distributed computing network equipped with GPUs. 
-There are 17 nodes in total, one representing the server-side, and the other 16 nodes representing clients, which can be organizations in the real world (e.g., the hospitals). 
-Each node is a physical server that has an NVIDIA RTX 2080Ti GPU card inside. 
-we assume all the clients join the training process for every communication round.
-
-
-
-## 3. Experiments
+## Experiments
 Once the hardware and software environment are both ready, you can easily use the following command to run FedNAS.
 Note:
 1. you may find other packages are missing. Please install accordingly by "conda" or "pip".
@@ -106,38 +57,3 @@ The running script for such setting is:
 sh run_fednas_search.sh 4 darts hetero 50 5 8
 ```
 
-
-### 4. Citations
-If you use any part of this code in your research or any engineering project, please cite our paper: 
-
-```
-@inproceedings{FedNAS,
-  title={FedNAS: Federated Deep Learning via Neural Architecture Search},
-  author={He, Chaoyang and Annavaram, Murali and Avestimehr, Salman},
-  booktitle={CVPR 2020 Workshop on Neural Architecture Search and Beyond for Representation Learning},
-  year={2020},
-}
-```
-
-https://chaoyanghe.com/publications/FedNAS-CVPR2020-NAS.pdf
-
-```
-@inproceedings{MiLeNAS,
-  title={MiLeNAS: Efficient Neural Architecture Search via Mixed-Level Reformulation},
-  author={He, Chaoyang and Ye, Haishan and Shen, Li and Zhang, Tong},
-  booktitle={Proceedings of IEEE Conference on Computer Vision and Pattern Recognition (CVPR)},
-  year={2020},
-}
-```
-
-
-
-
-### 5. Contacts
-Please feel free to contact me if you meet any problem when using this source code.
-I am glad to upgrade the code meet to your requirements if it is reasonable.
-
-I am also open to collaboration based on this elementary system and research idea.
-
-> Chaoyang He \
-> http://chaoyanghe.com
