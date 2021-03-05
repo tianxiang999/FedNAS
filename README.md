@@ -45,32 +45,16 @@ https://docs.conda.io/projects/conda/en/latest/user-guide/cheatsheet.html
 ### **- Weights and Bias**
 > pip install --upgrade wandb
 
+### **- torchsummaryX**
+> pip install torchsummaryX
+
 ### **- NFS (Network File System) Configuration**
 Please google related installment instructions according to the OS version of your server.
 
 ### **- change SSH configuration for your cluster**
 
-- On your local computer (MAC/Windows), generate the public key:
-> mkdir ~/.ssh
-> ls ~/.ssh
-> ssh-keygen -t rsa
-> vim ~/.ssh/id_rsa.pub
+Login out and login again, you will find you don't need to input the passwords anymore.
 
-- Login to the server-side:
-> ssh chaoyang@gpumaster-scip.usc.edu
-
-- modify the "authorized_keys"
-> vim ~/.ssh/authorized_keys
-
-
-Paste the string in "id_rsa.pub" file on your local computer to the server side "authorized_keys" file, and save the authorized_keys
-> chmod 700 ~/.ssh/
-> chmod 600 ~/.ssh/authorized_keys
-
-
-- login out and login again, you will find you don't need to input the passwords anymore.
-
-For other nodes on your server, use a similar method to configure the SSH.
 
 ### **- config MPI host file**
 Modify the hostname list in "mpi_host_file" to correspond to your actual physical network topology.

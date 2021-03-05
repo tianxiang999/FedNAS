@@ -88,12 +88,14 @@ def add_args(parser):
 
 def init_server(args, comm, rank, size, round_num):
     # machine learning experiment tracking platform: https://www.wandb.com/
+    print ("Tianxiang in init Server 1")
     wandb.init(
         project="federated_nas",
         name="FedNAS(d)" + str(args.partition) + "r" + str(args.comm_round) + "-e" + str(args.epochs) + "-lr" + str(
             args.learning_rate),
         config=args
     )
+    print ("Tianxiang in init Server 2")    
 
     # load data
     logging.info("load dataset")
@@ -112,25 +114,33 @@ def init_server(args, comm, rank, size, round_num):
     logging.info("net_dataidx_map = " + str(net_dataidx_map))
     logging.info("#####################")
 
+    print ("Tianxiang in init Server 3")
+
     all_train_data_num = sum([len(net_dataidx_map[r]) for r in range(args.client_number)])
     train_global, test_global = get_dataloader(args.dataset, args_datadir, args.batch_size, args.batch_size)
     logging.info("train_dl_global number = " + str(len(train_global)))
     logging.info("test_dl_global number = " + str(len(test_global)))
 
+    print ("Tianxiang in init Server 4")
+
     # aggregator
     client_num = size - 1
     aggregator = FedNASAggregator(train_global, test_global, all_train_data_num, client_num, device, args)
+
+    print ("Tianxiang in init Server 5")
 
     # start the distributed training
     server_manager = ServerMananger(args, comm, rank, size, round_num, aggregator)
     server_manager.run()
 
+    print ("Tianxiang in init Server 6")
 
 def init_client(args, comm, rank, size, round_num, seed):
     # to make sure each client has the same initial weight
     torch.manual_seed(seed)
 
     client_ID = rank - 1
+    print ("Tianxiang in init client 1, clinet id: ",client_ID)
 
     # 1. load data
     logging.info("load dataset")
@@ -146,29 +156,36 @@ def init_client(args, comm, rank, size, round_num, seed):
                                                                                              args=args)
     logging.info("traindata_cls_counts = " + str(traindata_cls_counts))
 
+    print ("Tianxiang in init client 2")
     all_train_data_num = sum([len(net_dataidx_map[r]) for r in range(args.client_number)])
     dataidxs = net_dataidx_map[client_ID]
     # logging.info("rank = %d, dataidxs = %s" % (rank, dataidxs))
     local_sample_number = len(dataidxs)
     logging.info("rank = %d, local_sample_number = %d" % (rank, local_sample_number))
 
+    print ("Tianxiang in init client 3")
+
     split = int(np.floor(0.5 * local_sample_number))  # split index
     train_idxs = dataidxs[0:split]
     test_idxs = dataidxs[split:local_sample_number]
+
+    print ("Tianxiang in init client 4")
 
     train_local, _ = get_dataloader(args.dataset, args_datadir, args.batch_size, args.batch_size, train_idxs)
     logging.info("rank = %d, batch_num_train_local = %d" % (rank, len(train_local)))
 
     test_local, _ = get_dataloader(args.dataset, args_datadir, args.batch_size, args.batch_size, test_idxs)
     logging.info("rank = %d, batch_num_test_local = %d" % (rank, len(test_local)))
-
+   
     # 2. initialize the trainer
     trainer = FedNASTrainer(client_ID, train_local, test_local, local_sample_number, all_train_data_num, device, args)
+    print ("Tianxiang in init client 5")
 
     # 3. start the distributed training
     client_manager = ClientMananger(args, comm, rank, size, round_num, trainer)
     client_manager.run()
 
+    print ("Tianxiang in init client 6")
 
 def init_training_device(process_ID, size):
     # initialize the mapping from process ID to GPU ID: <process ID, GPU ID>
