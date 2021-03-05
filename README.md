@@ -5,6 +5,7 @@ PyTorch 1.4.0, MPI4Py 3.0.3 (https://pypi.org/project/mpi4py), Python 3.7.4, wan
 1. Create environment space
 
 > conda create --name fednas --file spec-list.txt
+> conda activate fednas
 
 2. Other packages: Wandb & torchsummaryX
 
